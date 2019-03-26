@@ -271,12 +271,19 @@ func (c *reportDiskUsage) reportDiskUsage(client *simpleClient, out io.Writer, o
 			fmt.Sprintf("/%s", row.Key),
 			toHumanSize(row.DiskUsage),
 			toHumanSize(row.DiskQuota),
-			fmt.Sprintf("%d%%", (row.DiskUsage*100.0)/row.DiskQuota),
+			toPercent(row.DiskUsage, row.DiskQuota),
 		})
 	}
 	table.Render()
 
 	return nil
+}
+
+func toPercent(num, denom int) string {
+	if denom == 0 {
+		return "NaN"
+	}
+	return fmt.Sprintf("%d%%", (num*100.0)/denom)
 }
 
 func toHumanSize(b int) string {
@@ -309,7 +316,7 @@ func (c *reportDiskUsage) GetMetadata() plugin.PluginMetadata {
 		Name: "report-disk-usage",
 		Version: plugin.VersionType{
 			Major: 0,
-			Minor: 1,
+			Minor: 2,
 			Build: 0,
 		},
 		MinCliVersion: plugin.VersionType{
